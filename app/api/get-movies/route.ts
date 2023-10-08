@@ -1,50 +1,37 @@
-import { MOVIE_BASE_URL, MOVIE_ACCESS_TOKEN } from "@/app/config";
-import { error } from "console";
+import { MOVIE_BASE_URL, MOVIE_ACCESS_TOKEN} from "@/app/config";
 
-export async function GET(){
-    if (!MOVIE_BASE_URL){
-        return new Response ("Movie api token not found", {
-            status: 400,
-        });
-    }
-
-    if(!MOVIE_ACCESS_TOKEN){
-        return new Response("Movie base url not found", {
-            status: 404,
-        });
-
-     
-    }
+export async function GET(_request:Request,{params}:{params:{movie_id:number}}){
+    const movie_id=params.movie_id
     try{
-           const request = await fetch (`${MOVIE_BASE_URL}/3/movie/popular`,{
-            method: 'GET',
-            headers:{
-                'content-Type': 'application/json',
-                'Authorization': `Bearer ${MOVIE_ACCESS_TOKEN}`
-            },
-        });
-        if(!request.ok){
-            throw new Error(`Request failed with status ${request.status}`);
+        if (!MOVIE_BASE_URL) {
+            return new Response('Movie base url not found',{
+                status:404,
+                statusText:"failed",
+            })
         }
-        const responseJson = await request.json();
-        return new Response(JSON.stringify(responseJson), {
-            status: 200,
-            statusText: 'sucess',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        if(!MOVIE_ACCESS_TOKEN){
+            return new Response('Movie access token not found',{
+                status:404,
+                statusText:'failed'
+            })
+        }
+        const response=await fetch(`${MOVIE_BASE_URL}/3/movie/${movie_id}`,{
+            method:'GET',
+            headers:{
+                'Content-Type':'application/json',
+                Authorization:`Bearer ${MOVIE_ACCESS_TOKEN}`
+            }
+        })
+        const result=await response.json()
+        return new Response(JSON.stringify(result),{
+            status:200,
+            statusText:"success"
+        })
     }
-    catch(error: any){
-        return new Response(JSON.stringify({ error: error.message}),{
-            status: 500,
-            statusText: 'failed',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        
-           
+    catch(error:any){
+        return new Response(error,{
+            status:500,
+            statusText:'failed'
+        })
     }
-    
 }
