@@ -1,44 +1,36 @@
-import { MOVIE_BASE_URL, MOVIE_ACCESS_TOKEN } from "@/app/config";
-
-export async function GET(
-    _request: Request,
-    {params}:{params:{movie_id:number}}) {
-    const movie_id = params.movie_id;
-    if (!MOVIE_BASE_URL){
-        return new Response("No movie base URL found",{
-            status: 404,
-            statusText: 'failed'
-        })
-    }
-
-    if (!MOVIE_ACCESS_TOKEN){
-        return new Response ('No movie access token found ',{
-            status: 404,
-            statusText: 'failed'
-        })
-    }
-
+import { MOVIE_BASE_URL, MOVIE_ACCESS_TOKEN} from "@/app/config";
+export async function GET(_request:Request,{params}:{params:{movie_id:number}}){
+    const movie_id=params.movie_id
     try{
-
-        const response = await fetch (`${MOVIE_BASE_URL}/3/movies/${movie_id}`,{
-            method: 'GET',
+        if (!MOVIE_BASE_URL) {
+            return new Response('Movie base url not found',{
+                status:404,
+                statusText:"failed",
+            })
+        }
+        if(!MOVIE_ACCESS_TOKEN){
+            return new Response('Movie access token not found',{
+                status:404,
+                statusText:'failed'
+            })
+        }
+        const response=await fetch(`${MOVIE_BASE_URL}/3/movie/${movie_id}`,{
+            method:'GET',
             headers:{
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${MOVIE_ACCESS_TOKEN}`,
-            },
-        });
-
-        const result = await response.json();
-        return new Response( JSON.stringify(result), {
-            status: 200,
-            statusText: "Success",
-        });
-
+                'Content-Type':'application/json',
+                Authorization:`Bearer ${MOVIE_ACCESS_TOKEN}`
+            }
+        })
+        const result=await response.json()
+        return new Response(JSON.stringify(result),{
+            status:200,
+            statusText:"success"
+        })
     }
-    catch(error: any){
-        return new Response (error,{
-            status: 500,
-            statusText: "error"
+    catch(error:any){
+        return new Response(error,{
+            status:500,
+            statusText:'failed'
         })
     }
 }
